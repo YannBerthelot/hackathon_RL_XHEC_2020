@@ -1,0 +1,8 @@
+hackathon_rl_env/
+__pycache__
+.DS_Store
+data/checkpoints
+*.txt
+#*.png
+figs/
+vids/
