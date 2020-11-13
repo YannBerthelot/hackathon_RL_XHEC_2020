@@ -14,10 +14,6 @@ import gym
 # utils
 from utils import clip_states, info_extractor, display_info, save_progress, save_graph
 
-# from PyPowerGadget import PowerMeter
-
-# ower_meter = PowerMeter(project_name="RL hackathon XHEC")
-
 
 class SpaceXRL:
     def __init__(self):
@@ -172,52 +168,17 @@ class SpaceXRL:
         ##### Agent definition ########
         if not (load):
             agent = Agent.create(
-                "ppo",
-                environment=env,
-                # Automatically configured network
-                network={"type": "auto", "rnn": False},
-                # Optimization,
-                batch_size=64,
-                use_beta_distribution=True,
-                memory="minimum",
-                update_frequency=8,
-                learning_rate=0.0001,
-                multi_step=5,
-                subsampling_fraction=0.90,
-                likelihood_ratio_clipping=0.10,
-                discount=0.99,
-                predict_terminal_values=False,
-                baseline={"type": "auto", "rnn": False},
-                baseline_optimizer={
-                    "optimizer": "adam",
-                    "learning_rate": 0.003670157218888348,
-                    "multi_step": 20,
-                },
-                state_preprocessing="linear_normalization",
-                reward_preprocessing=None,
-                exploration=dict(
-                    type="exponential",
-                    unit="episodes",
-                    num_steps=1000,
-                    initial_value=0.05,
-                    decay_rate=0.01,
-                ),
-                variable_noise=0.0,
-                l2_regularization=0.0,
-                entropy_regularization=0.0001,
-                parallel_interactions=1,
-                config=None,
+                agent="dqn",
+                batch_size=10,
+                memory=1000,
+                # param1=value, e.g discount=x,
+                # param2=value,
+                # etc...,
                 saver=dict(
                     directory="data/checkpoints",
                     frequency=10,  # save checkpoint every 10 updates
-                ),
-                summarizer=None,
-                recorder=None,
-                optimization_steps=None,
-                estimate_terminal=None,
-                critic_network=None,
-                baseline_network=None,
-                critic_optimizer=None,
+                ),  # don't change this
+                environment=env,
             )
 
         else:
@@ -256,7 +217,6 @@ class SpaceXRL:
                 actions, internals = agent.act(
                     states=states, internals=internals, independent=True
                 )
-                # actions = agent.act(states=states, independent=False)
             else:
                 actions = agent.act(states=states, independent=False)
             if (timestep % 10 == 0) and verbose:
@@ -267,8 +227,6 @@ class SpaceXRL:
             reward_list.append(reward)
             if not (test):
                 agent.observe(terminal=terminal, reward=reward)
-            # if test:
-            #     agent.observe(terminal=terminal, reward=reward)
         return reward_list
 
     def reward_function(
@@ -323,10 +281,18 @@ class SpaceXRL:
 
         ######## REWARD SHAPING ###########
         # reward definition (per timestep) : You have to fill it !
-        reward = min(0, max(-(angle * angular_velocity), -abs(x) - abs(distance)))
-        reward = reward / 10
-        if self.env.environment.landed_ticks > 59:
-            reward += 150
+        # veloc = (1.5 - distance) * abs(velocity)
+        # reward = -3 * (angle * angular_velocity) - (4 * distance)
+
+        # if distance < 0.5:
+        #     reward += -5 * velocity
+        # reward = reward / 100
+        # if self.env.environment.landed_ticks > 1:
+        #     reward += 10 * (1 - distance)
+        # if self.env.environment.landed_ticks > 59:
+        #     reward += 1000 * (1 - distance)
+
+        reward = -1
 
         display_info(states, additionnal_information, reward, timestep, verbose=False)
 
@@ -340,14 +306,13 @@ if __name__ == "__main__":
     and at which frequency the agent video is displayed
     if load = False, train from scratch else train from where you left
     """
-
     environment = SpaceXRL()
-    level = 1
+    level = 0
 
-    n_episodes = 1000
-    n_episode_per_batch = 100
+    n_episodes = 20
+    n_episode_per_batch = 10
     # Switch it to True if you want to restart from your previous agent
-    load = True
+    load = False
 
     n_batch = (n_episodes // n_episode_per_batch) + 1
     tqdm_bar = tqdm(range(1, n_batch + 1))
