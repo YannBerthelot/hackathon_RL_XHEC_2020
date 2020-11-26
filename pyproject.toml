@@ -13,6 +13,7 @@ gym = {git = "https://github.com/YannBerthelot/gym_rocketLander.git"}
 Box2D = "^2.3.10"
 PyVirtualDisplay = "^1.3.2"
 ipython = "^7.0"
+ipykernel = "^5.3.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
