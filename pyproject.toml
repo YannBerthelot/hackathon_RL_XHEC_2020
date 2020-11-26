@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "hackathon_rl_xhec"
+version = "0.1.0"
+description = ""
+authors = ["Yann Berthelot <yannberthelot1@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+pandas = "^1.1.4"
+tqdm = "^4.51.0"
+Tensorforce = "0.6.1"
+gym = {git = "https://github.com/YannBerthelot/gym_rocketLander.git"}
+Box2D = "^2.3.10"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

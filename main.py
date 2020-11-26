@@ -3,7 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import matplotlib.pyplot as plt
+import requests
+import datetime
+import json
 
 # RL
 import tensorforce
@@ -15,9 +17,10 @@ import gym
 # utils
 from utils import clip_states, info_extractor, display_info, save_progress, save_graph
 
-# from PyPowerGadget import PowerMeter
-
-# ower_meter = PowerMeter(project_name="RL hackathon XHEC")
+# Group Info :
+GROUP_NAME = "ADMIN"
+DATE = str(datetime.datetime.today())
+COMMENT = "First Test"
 
 
 class SpaceXRL:
@@ -117,7 +120,6 @@ class SpaceXRL:
             if self.env.environment.landed_ticks > 59:
                 self.number_of_landings += 1
             if (self.fraction_good_landings > threshold) and (i > 50):
-                print("level cracked")
                 self.cracked = True
                 break
 
@@ -174,52 +176,16 @@ class SpaceXRL:
         ##### Agent definition ########
         if not (load):
             agent = Agent.create(
-                "ppo",
-                environment=env,
-                # Automatically configured network
-                network={"type": "auto", "rnn": False},
-                # Optimization,
-                batch_size=64,
-                use_beta_distribution=True,
-                memory="minimum",
-                update_frequency=8,
-                learning_rate=0.0001,
-                multi_step=5,
-                subsampling_fraction=0.90,
-                likelihood_ratio_clipping=0.10,
-                discount=0.99,
-                predict_terminal_values=False,
-                baseline={"type": "auto", "rnn": False},
-                baseline_optimizer={
-                    "optimizer": "adam",
-                    "learning_rate": 0.003670157218888348,
-                    "multi_step": 20,
-                },
-                state_preprocessing="linear_normalization",
-                reward_preprocessing=None,
-                exploration=dict(
-                    type="exponential",
-                    unit="episodes",
-                    num_steps=1000,
-                    initial_value=0.05,
-                    decay_rate=0.01,
-                ),
-                variable_noise=0.0,
-                l2_regularization=0.0,
-                entropy_regularization=0.0001,
-                parallel_interactions=1,
-                config=None,
+                agent="ppo",
+                batch_size=10,
+                # param1=value, e.g discount=x,
+                # param2=value,
+                # etc...,
                 saver=dict(
                     directory="data/checkpoints",
                     frequency=10,  # save checkpoint every 10 updates
-                ),
-                summarizer=None,
-                recorder=None,
-                optimization_steps=None,
-                estimate_terminal=None,
-                critic_network=None,
-                baseline_network=None,
-                critic_optimizer=None,
+                ),  # don't change this
+                environment=env,
             )
 
         else:
@@ -258,7 +224,6 @@ class SpaceXRL:
                 actions, internals = agent.act(
                     states=states, internals=internals, independent=True
                 )
-                # actions = agent.act(states=states, independent=False)
             else:
                 actions = agent.act(states=states, independent=False)
             if (timestep % 10 == 0) and verbose:
@@ -269,8 +234,6 @@ class SpaceXRL:
             reward_list.append(reward)
             if not (test):
                 agent.observe(terminal=terminal, reward=reward)
-            # if test:
-            #     agent.observe(terminal=terminal, reward=reward)
         return reward_list
 
     def reward_function(
@@ -325,21 +288,34 @@ class SpaceXRL:
 
         ######## REWARD SHAPING ###########
         # reward definition (per timestep) : You have to fill it !
-        # reward = min(0, max(-(angle * angular_velocity), -abs(x) - abs(distance)))
-        # reward = reward/10
-        reward = -((angle * angular_velocity) ** 2) - abs(x) ** 2 - abs(distance)
-        reward = np.clip(reward / 10, -1, 1)
-        # reward = -abs(x) - abs(distance) - angle ** 2 - velocity
-        # reward = np.clip(reward / 10, -1, 1)
-        if self.env.environment.landed_ticks > 0:
-            reward += 1 * (1 - abs(x)) ** 2
-        if self.env.environment.landed_ticks > 59:
-            reward += 500 * (1 - abs(x)) ** 2
+
+        reward = -1
 
         display_info(states, additionnal_information, reward, timestep, verbose=False)
 
         return reward
 
+
+def prep_data_to_send(inputs): 
+    dict_data = {
+        "id":GROUP_NAME+"__"+str(DATE),
+        "group_name": GROUP_NAME,
+        "datetime": DATE, 
+        "info": json.dumps(list(inputs))
+    }
+    return dict_data
+
+def send_result(data): 
+    
+    url = "https://pakmcaujg0.execute-api.eu-west-3.amazonaws.com/post-result"
+
+    payload=json.dumps(data)
+    headers = {
+      'Content-Type': 'application/json'
+    }
+    response = requests.request("POST", url, headers=headers, data=json.dumps(data))
+    
+    return print(response.text)
 
 if __name__ == "__main__":
     """
@@ -348,12 +324,11 @@ if __name__ == "__main__":
     and at which frequency the agent video is displayed
     if load = False, train from scratch else train from where you left
     """
-
     environment = SpaceXRL()
-    level = 1
+    level = 0
 
-    n_episodes = 10000
-    n_episode_per_batch = 100
+    n_episodes = 20
+    n_episode_per_batch = 10
     # Switch it to True if you want to restart from your previous agent
     load = False
 
@@ -383,10 +358,16 @@ if __name__ == "__main__":
                 "level %d cleared : %d%% good landings"
                 % (level, environment.fraction_good_landings)
             )
-            level += 1  # change to one if you want to automatically change level when the current level is beaten
+            level += 0  # change to one if you want to automatically change level when the current level is beaten
             environment.cracked = False
             if level > 3:
                 break
+
+        # SENDING INFO TO DATABASE        
+        inputs = [environment.fraction_good_landings, i, level]
+        result_data = prep_data_to_send(inputs)
+        send_result(result_data)
+
     if environment.cracked:
         print(
             "level %d cleared : %d%% good landings"

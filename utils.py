@@ -73,7 +73,7 @@ def info_extractor(states_list, env):
 
 
 def display_info(
-    states, additionnal_information, reward, timestep, n_timesteps=10, verbose=True
+    states, additionnal_information, reward, timestep, n_timesteps=50, verbose=True
 ):
     """
     Displays information every n_timesteps, during training
@@ -87,10 +87,12 @@ def display_info(
             print("states", states_display)
             additionnal_information_display = {
                 key: np.round(additionnal_information[key], 2)
+                if type(additionnal_information[key]) == "float"
+                else additionnal_information[key]
                 for key in additionnal_information.keys()
             }
             print("additionnal info", additionnal_information_display)
-            print("reward value", np.round(reward, 2))
+            print("reward value", np.round(reward, 5))
 
 
 def save_graph(

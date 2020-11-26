@@ -3,18 +3,13 @@ This repository contains the materials necessary for the ending Hackathon for th
 The goal is for the students to define the rewards and train&tweak the agent to achieve the best score possible.
 
 **How-to use it:**
-1. Clone this repository : `git clone --recursive https://gitlab.com/the_insighters/x-hec/hackathon-rlxhec.git`
+1. Clone this repository : `git clone https://gitlab.com/the_insighters/x-hec/hackathon-rlxhec.git`
 2. Enter the repo folder `cd hackathon-rlxhec`
-3. (Optional if already done) : install virtualenv `pip install virtualenv`
-4. Create a virtualenv : `virtualenv "hackathon_rl_env"`
-5. Activate the virtualenv : `source hackathon_rl_env/bin/activate` for MAC.
-6. Install the libraries : `pip install -r requirements.txt`
-7. Move to the custom environment folder : `cd gym_rocketLander`
-8. Install the custom environment : `pip install -e .`
-9. Go back to main folder : `cd ..`
-10. You can now run main.py : `python main.py`
-11. Modify main.py to tweak the agent and reward.
-12. Good luck !
+3. (Optional if already done) : install poetry `curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -`
+4. Install the libraries : `poetry install`
+5. You can now run main.py using poetry: `poetry run python main.py`
+6. Modify main.py to tweak the agent and reward.
+7. Good luck !
 
 **To-do list**
 - [x] Transform the Rocker lander from https://github.com/EmbersArc/gym_rocketLander/blob/master/gym/envs/box2d/rocket_lander.py into an exploitable environment.
@@ -26,8 +21,8 @@ The goal is for the students to define the rewards and train&tweak the agent to 
 - [X] Add a cue when the task is "solved"
 - [X] Add landed and landed full to available variables
 - [x] Add difficulty levels (done but not very useful, maybe a score system will be beter)
-- [ ] Add variables description
-- [ ] Solve the task with simpler agents
+- [x] Add score
+- [x] Add variables description
 - [ ] Tweak the difficulty for a nice experience
 - [ ] Test the exercise with different people to measure difficulty and time to beat
 
@@ -41,7 +36,12 @@ The goal is for the students to define the rewards and train&tweak the agent to 
 - figs (folder): stores the graphs (rewards over the episodes)
 - vids (folder): stores the vids of the agent's execution for each batch
 
+**Variable explanation**
 
+![](images/distances.png)
+![](images/angles.png)
+![](images/thrust.png)
+![](images/gimbal.png)
 
 
 **Disclaimer:**
