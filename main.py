@@ -22,6 +22,63 @@ GROUP_NAME = "ADMIN"
 DATE = str(datetime.datetime.today())
 COMMENT = "First Test"
 
+from gym.wrappers import Monitor
+import glob
+import io
+import base64
+from IPython.display import HTML
+from pyvirtualdisplay import Display
+from IPython import display as ipythondisplay
+
+display = Display(visible=0, size=(1400, 900))
+display.start()
+
+
+def show_video():
+    mp4list = glob.glob("video/*.mp4")
+    if len(mp4list) > 0:
+        mp4 = mp4list[0]
+        video = io.open(mp4, "r+b").read()
+        encoded = base64.b64encode(video)
+        ipythondisplay.display(
+            HTML(
+                data="""<video alt="test" autoplay 
+                loop controls style="height: 400px;">
+                <source src="data:video/mp4;base64,{0}" type="video/mp4" />
+             </video>""".format(
+                    encoded.decode("ascii")
+                )
+            )
+        )
+    else:
+        print("Could not find video")
+
+
+def wrap_env(env):
+    env = Monitor(env, "./video", force=True)
+    return env
+
+
+env = wrap_env(gym.make("RocketLander-v0"))
+# env = wrap_env(gym.make("Atlantis-v0"))
+
+observation = env.reset()
+
+while True:
+
+    env.render()
+
+    # your agent goes here
+    action = env.action_space.sample()
+
+    observation, reward, done, info = env.step(action)
+
+    if done:
+        break
+
+env.close()
+show_video()
+
 
 class SpaceXRL:
     def __init__(self):
@@ -296,26 +353,26 @@ class SpaceXRL:
         return reward
 
 
-def prep_data_to_send(inputs): 
+def prep_data_to_send(inputs):
     dict_data = {
-        "id":GROUP_NAME+"__"+str(DATE),
+        "id": GROUP_NAME + "__" + str(DATE),
         "group_name": GROUP_NAME,
-        "datetime": DATE, 
-        "info": json.dumps(list(inputs))
+        "datetime": DATE,
+        "info": json.dumps(list(inputs)),
     }
     return dict_data
 
-def send_result(data): 
-    
+
+def send_result(data):
+
     url = "https://pakmcaujg0.execute-api.eu-west-3.amazonaws.com/post-result"
 
-    payload=json.dumps(data)
-    headers = {
-      'Content-Type': 'application/json'
-    }
+    payload = json.dumps(data)
+    headers = {"Content-Type": "application/json"}
     response = requests.request("POST", url, headers=headers, data=json.dumps(data))
-    
+
     return print(response.text)
+
 
 if __name__ == "__main__":
     """
@@ -363,7 +420,7 @@ if __name__ == "__main__":
             if level > 3:
                 break
 
-        # SENDING INFO TO DATABASE        
+        # SENDING INFO TO DATABASE
         inputs = [environment.fraction_good_landings, i, level]
         result_data = prep_data_to_send(inputs)
         send_result(result_data)
