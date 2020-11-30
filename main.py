@@ -376,6 +376,7 @@ class SpaceXRL:
                 actions, internals = agent.act(
                     states=states, internals=internals, independent=True
                 )
+                # actions = agent.act(states=states, independent=False)
             else:
                 actions = agent.act(states=states, independent=False)
             if (timestep % 10 == 0) and verbose:
@@ -384,9 +385,13 @@ class SpaceXRL:
             states, terminal, reward = env.execute(actions=actions)
             reward = self.reward_function(states, timestep)
             reward_list.append(reward)
+
             if not (test):
                 agent.observe(terminal=terminal, reward=reward)
-        return reward_list
+            # if test:
+            #     agent.observe(terminal=terminal, reward=reward)
+        score = self.compute_score(states, timestep)
+        return reward_list, score
 
     def reward_function(
         self, states_list, timestep=0, print_states=True, print_additionnal_info=True
