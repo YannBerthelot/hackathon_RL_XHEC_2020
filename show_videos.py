@@ -29,4 +29,7 @@ def show_video(i):
 
 
 if __name__ == "__main__":
-    
+    number_vids = len(os.listdir("vids"))
+    for i in range(number_vids):
+        print(f"Batch {i+1}")
+        show_video(i + 1)

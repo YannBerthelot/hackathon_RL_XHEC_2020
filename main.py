@@ -1,3 +1,8 @@
+# Group Info :
+GROUP_NAME = "ADMIN"
+DATE = str(datetime.datetime.today())
+COMMENT = "First Test"
+
 # General
 import os
 import numpy as np
@@ -27,10 +32,6 @@ from utils import (
 
 from pyvirtualdisplay import Display
 
-# Group Info :
-GROUP_NAME = "ADMIN"
-DATE = str(datetime.datetime.today())
-COMMENT = "First Test"
 
 display = Display(visible=0, size=(1400, 900))
 display.start()
@@ -405,7 +406,7 @@ if __name__ == "__main__":
     # Switch it to True if you want to restart from your previous agent
     load = False
 
-    n_batch = (n_episodes // n_episode_per_batch) + 1
+    n_batch = n_episodes // n_episode_per_batch
     tqdm_bar = tqdm(range(1, n_batch + 1))
     for i in tqdm_bar:
         if not (os.path.exists("vids")):
