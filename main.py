@@ -245,7 +245,7 @@ class SpaceXRL:
 
         # SENDING INFO TO DATABASE
         inputs = np.mean(score_list)
-        result_data = prep_data_to_send(inputs)
+        result_data = prep_data_to_send(inputs, GROUP_NAME, DATE)
         send_result(result_data)
 
     def compute_score(
