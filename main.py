@@ -15,7 +15,15 @@ from tensorforce import Agent, Environment
 import gym
 
 # utils
-from utils import clip_states, info_extractor, display_info, save_progress, save_graph
+from utils import (
+    clip_states,
+    info_extractor,
+    display_info,
+    save_progress,
+    save_graph,
+    prep_data_to_send,
+    send_result,
+)
 
 # Group Info :
 GROUP_NAME = "ADMIN"
@@ -367,32 +375,21 @@ class SpaceXRL:
         ######## REWARD SHAPING ###########
         # reward definition (per timestep) : You have to fill it !
 
-        reward = -1
+        # reward definition (per timestep) : You have to fill it !
+        # reward = min(0, max(-(angle * angular_velocity), -abs(x) - abs(distance)))
+        # reward = reward/10
+        reward = -((angle * angular_velocity) ** 2) - abs(x) ** 2 - abs(distance)
+        reward = np.clip(reward / 10, -1, 1)
+        # reward = -abs(x) - abs(distance) - angle ** 2 - velocity
+        # reward = np.clip(reward / 10, -1, 1)
+        if self.env.environment.landed_ticks > 0:
+            reward += 1 * min((1 - abs(x)), 0.5) ** 2
+        if self.env.environment.landed_ticks > 59:
+            reward += 500 * min((1 - abs(x)), 0.5) ** 2
 
         display_info(states, additionnal_information, reward, timestep, verbose=False)
 
         return reward
-
-
-def prep_data_to_send(inputs):
-    dict_data = {
-        "id": GROUP_NAME + "__" + str(DATE),
-        "group_name": GROUP_NAME,
-        "datetime": DATE,
-        "info": json.dumps(list(inputs)),
-    }
-    return dict_data
-
-
-def send_result(data):
-
-    url = "https://pakmcaujg0.execute-api.eu-west-3.amazonaws.com/post-result"
-
-    payload = json.dumps(data)
-    headers = {"Content-Type": "application/json"}
-    response = requests.request("POST", url, headers=headers, data=json.dumps(data))
-
-    return print(response.text)
 
 
 if __name__ == "__main__":
@@ -405,8 +402,8 @@ if __name__ == "__main__":
     environment = SpaceXRL()
     level = 0
 
-    n_episodes = 20
-    n_episode_per_batch = 10
+    n_episodes = 1000
+    n_episode_per_batch = 100
     # Switch it to True if you want to restart from your previous agent
     load = False
 
@@ -451,3 +448,4 @@ if __name__ == "__main__":
             "level %d cleared : %d%% good landings"
             % (level, environment.fraction_good_landings)
         )
+display.stop()

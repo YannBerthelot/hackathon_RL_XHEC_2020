@@ -124,3 +124,24 @@ def save_progress(load, data, filename, level=0):
         data = data_prev
         pickle.dump(data, open(file_name, "wb"))
     return data
+
+
+def prep_data_to_send(inputs):
+    dict_data = {
+        "id": GROUP_NAME + "__" + str(DATE),
+        "group_name": GROUP_NAME,
+        "datetime": DATE,
+        "info": json.dumps(list(inputs)),
+    }
+    return dict_data
+
+
+def send_result(data):
+
+    url = "https://pakmcaujg0.execute-api.eu-west-3.amazonaws.com/post-result"
+
+    payload = json.dumps(data)
+    headers = {"Content-Type": "application/json"}
+    response = requests.request("POST", url, headers=headers, data=json.dumps(data))
+
+    return print(response.text)
