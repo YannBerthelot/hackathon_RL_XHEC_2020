@@ -3,6 +3,8 @@ import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import json
+import requests
 
 
 def clip_states(states):
@@ -131,7 +133,7 @@ def prep_data_to_send(inputs, GROUP_NAME, DATE):
         "id": GROUP_NAME + "__" + str(DATE),
         "group_name": GROUP_NAME,
         "datetime": DATE,
-        "info": json.dumps(list(inputs)),
+        "info": json.dumps(inputs),
     }
     return dict_data
 
