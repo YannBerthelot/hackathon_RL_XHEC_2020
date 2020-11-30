@@ -126,7 +126,7 @@ def save_progress(load, data, filename, level=0):
     return data
 
 
-def prep_data_to_send(inputs):
+def prep_data_to_send(inputs, GROUP_NAME, DATE):
     dict_data = {
         "id": GROUP_NAME + "__" + str(DATE),
         "group_name": GROUP_NAME,
