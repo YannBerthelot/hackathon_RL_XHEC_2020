@@ -31,8 +31,8 @@ DATE = str(datetime.datetime.today())
 COMMENT = "First Test"
 
 
-def show_video():
-    mp4list = glob.glob("video/*.mp4")
+def show_video(i):
+    mp4list = glob.glob(f"vids/{i}/*.mp4")
     if len(mp4list) > 0:
         mp4 = mp4list[0]
         video = io.open(mp4, "r+b").read()
@@ -63,24 +63,24 @@ display = Display(visible=0, size=(1400, 900))
 display.start()
 
 
-def show_video():
-    mp4list = glob.glob("video/*.mp4")
-    if len(mp4list) > 0:
-        mp4 = mp4list[0]
-        video = io.open(mp4, "r+b").read()
-        encoded = base64.b64encode(video)
-        ipythondisplay.display(
-            HTML(
-                data="""<video alt="test" autoplay 
-                loop controls style="height: 400px;">
-                <source src="data:video/mp4;base64,{0}" type="video/mp4" />
-             </video>""".format(
-                    encoded.decode("ascii")
+    def show_video():
+        mp4list = glob.glob("vids/*.mp4")
+        if len(mp4list) > 0:
+            mp4 = mp4list[-1]
+            video = io.open(mp4, "r+b").read()
+            encoded = base64.b64encode(video)
+            ipythondisplay.display(
+                HTML(
+                    data="""<video alt="test" autoplay 
+                    loop controls style="height: 400px;">
+                    <source src="data:video/mp4;base64,{0}" type="video/mp4" />
+                </video>""".format(
+                        encoded.decode("ascii")
+                    )
                 )
             )
-        )
-    else:
-        print("Could not find video")
+        else:
+            print("Could not find video")
 
 
 def wrap_env(env):
@@ -498,6 +498,7 @@ if __name__ == "__main__":
             threshold=100,
         )
         load = True
+        show_video(i)
         if environment.cracked:
             print("")
             print(
