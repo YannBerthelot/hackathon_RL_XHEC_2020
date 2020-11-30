@@ -1,7 +1,4 @@
-# Group Info :
-GROUP_NAME = "ADMIN"
-DATE = str(datetime.datetime.today())
-COMMENT = "First Test"
+
 
 # General
 import os
@@ -32,6 +29,10 @@ from utils import (
 
 from pyvirtualdisplay import Display
 
+# Group Info :
+GROUP_NAME = "ADMIN"
+DATE = str(datetime.datetime.today())
+COMMENT = "First Test"
 
 display = Display(visible=0, size=(1400, 900))
 display.start()
