@@ -158,6 +158,7 @@ class SpaceXRL:
         # Loop over episodes
         reward_list_episodes = []
         reward_list = []
+        score_list = []
         landing_fraction_list = []
         tqdm_bar = tqdm(range(1, n_episodes + 1))
         self.number_of_landings = 0
@@ -193,19 +194,23 @@ class SpaceXRL:
                         "RocketLander-v0", visualize=True, level_number=level
                     )
 
-                reward_list = self.episode(self.env, i, agent, test=True, verbose=False)
+                reward_list, score = self.episode(
+                    self.env, i, agent, test=True, verbose=False
+                )
             else:
                 self.env = tensorforce.environments.OpenAIGym(
                     "RocketLander-v0", level_number=level
                 )
-                reward_list = self.episode(
+                reward_list, score = self.episode(
                     self.env, i, agent, test=False, verbose=False
                 )
+            score_list.append(score)
             reward_list_episodes.append(np.sum(reward_list))
             landing_fraction_list.append(self.fraction_good_landings)
             if self.env.environment.landed_ticks > 59:
                 self.number_of_landings += 1
             if (self.fraction_good_landings > threshold) and (i > 50):
+                print("level cracked")
                 self.cracked = True
                 break
 
@@ -213,6 +218,7 @@ class SpaceXRL:
         reward_list_episodes = save_progress(
             load, reward_list_episodes, "reward_list_episodes.txt", level=level
         )
+        score_list = save_progress(load, score_list, "score_list.txt", level=level)
         landing_fraction_list = save_progress(
             load, landing_fraction_list, "landing_fraction.txt", level=level
         )
@@ -224,11 +230,71 @@ class SpaceXRL:
             level=level,
         )
         save_graph(
+            score_list,
+            "Score vs number of episodes",
+            "score_vs_episodes.png",
+            rolling=True,
+            level=level,
+        )
+        save_graph(
             landing_fraction_list,
             "Landing fraction vs number of episodes",
             "landing_fraction_vs_episodes.png",
             level=level,
         )
+
+        # SENDING INFO TO DATABASE
+        inputs = np.mean(score_list)
+        result_data = prep_data_to_send(inputs)
+        send_result(result_data)
+
+    def compute_score(
+        self, states_list, timestep=0, print_states=True, print_additionnal_info=True
+    ):
+        """
+        Available information:
+        x : horizontal position
+        y : vertical position
+        angle : angle relative to the vertical (negative = right, positive = left)
+        first_leg_contact : Left leg touches ground
+        second_leg_contact : Right leg touches ground
+        throttle : Throttle intensity
+        gimbal : Gimbal angle relative to the rocket axis
+        velocity_x : horizontal velocity (negative : going Left, positive : going Right)
+        velocity_y : vertical velocity (negative : going Down, positive : going Up)
+        angular_velocity : angular velocity (negative : turning anti-clockwise, positive : turning clockwise)
+        distance : distance from the center of the ship
+        velocity : norm of the velocity vector (velocity_x,velocity_y)
+        landed : both legs touching the ground
+        landed_full : both legs touching ground for a second (60frames)
+        states : dictionnary containing all variables in the state vector. For display purpose
+        additionnal_information : dictionnary containing additionnal information. For display purpose
+
+        """
+        # states information extraction
+        (
+            x,
+            y,
+            angle,
+            first_leg_contact,
+            second_leg_contact,
+            throttle,
+            gimbal,
+            velocity_x,
+            velocity_y,
+            angular_velocity,
+            distance,
+            velocity,
+            landed,
+            landed_full,
+            states,
+            additionnal_information,
+        ) = info_extractor(states_list, self.env)
+        if self.env.environment.landed_ticks > 59:
+            score = 1 - abs(x)
+        else:
+            score = 0
+        return score
 
     def create_agent(
         self,
@@ -437,11 +503,6 @@ if __name__ == "__main__":
             environment.cracked = False
             if level > 3:
                 break
-
-        # SENDING INFO TO DATABASE
-        inputs = [environment.fraction_good_landings, i, level]
-        result_data = prep_data_to_send(inputs)
-        send_result(result_data)
 
     if environment.cracked:
         print(
