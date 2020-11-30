@@ -1,5 +1,3 @@
-
-
 # General
 import os
 import numpy as np
@@ -374,18 +372,7 @@ class SpaceXRL:
 
         ######## REWARD SHAPING ###########
         # reward definition (per timestep) : You have to fill it !
-
-        # reward definition (per timestep) : You have to fill it !
-        # reward = min(0, max(-(angle * angular_velocity), -abs(x) - abs(distance)))
-        # reward = reward/10
-        reward = -((angle * angular_velocity) ** 2) - abs(x) ** 2 - abs(distance)
-        reward = np.clip(reward / 10, -1, 1)
-        # reward = -abs(x) - abs(distance) - angle ** 2 - velocity
-        # reward = np.clip(reward / 10, -1, 1)
-        if self.env.environment.landed_ticks > 0:
-            reward += 1 * min((1 - abs(x)), 0.5) ** 2
-        if self.env.environment.landed_ticks > 59:
-            reward += 500 * min((1 - abs(x)), 0.5) ** 2
+        reward = -1
 
         display_info(states, additionnal_information, reward, timestep, verbose=False)
 
