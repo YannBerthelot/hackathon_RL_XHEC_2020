@@ -25,88 +25,15 @@ from utils import (
     send_result,
 )
 
+from pyvirtualdisplay import Display
+
 # Group Info :
 GROUP_NAME = "ADMIN"
 DATE = str(datetime.datetime.today())
 COMMENT = "First Test"
 
-
-def show_video(i):
-    mp4list = glob.glob(f"vids/{i}/*.mp4")
-    if len(mp4list) > 0:
-        mp4 = mp4list[0]
-        video = io.open(mp4, "r+b").read()
-        encoded = base64.b64encode(video)
-        ipythondisplay.display(
-            HTML(
-                data="""<video alt="test" autoplay 
-                loop controls style="height: 400px;">
-                <source src="data:video/mp4;base64,{0}" type="video/mp4" />
-             </video>""".format(
-                    encoded.decode("ascii")
-                )
-            )
-        )
-    else:
-        print("Could not find video")
-
-
-from gym.wrappers import Monitor
-import glob
-import io
-import base64
-from IPython.display import HTML
-from pyvirtualdisplay import Display
-from IPython import display as ipythondisplay
-
 display = Display(visible=0, size=(1400, 900))
 display.start()
-
-
-    def show_video():
-        mp4list = glob.glob("vids/*.mp4")
-        if len(mp4list) > 0:
-            mp4 = mp4list[-1]
-            video = io.open(mp4, "r+b").read()
-            encoded = base64.b64encode(video)
-            ipythondisplay.display(
-                HTML(
-                    data="""<video alt="test" autoplay 
-                    loop controls style="height: 400px;">
-                    <source src="data:video/mp4;base64,{0}" type="video/mp4" />
-                </video>""".format(
-                        encoded.decode("ascii")
-                    )
-                )
-            )
-        else:
-            print("Could not find video")
-
-
-def wrap_env(env):
-    env = Monitor(env, "./video", force=True)
-    return env
-
-
-env = wrap_env(gym.make("RocketLander-v0"))
-# env = wrap_env(gym.make("Atlantis-v0"))
-
-observation = env.reset()
-
-while True:
-
-    env.render()
-
-    # your agent goes here
-    action = env.action_space.sample()
-
-    observation, reward, done, info = env.step(action)
-
-    if done:
-        break
-
-env.close()
-show_video()
 
 
 class SpaceXRL:
@@ -498,7 +425,6 @@ if __name__ == "__main__":
             threshold=100,
         )
         load = True
-        show_video(i)
         if environment.cracked:
             print("")
             print(
