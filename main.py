@@ -29,7 +29,6 @@ from pyvirtualdisplay import Display
 
 # Group Info :
 GROUP_NAME = "ADMIN"
-DATE = str(datetime.datetime.today())
 COMMENT = "First Test"
 
 display = Display(visible=0, size=(1400, 900))
@@ -171,6 +170,7 @@ class SpaceXRL:
         )
 
         # SENDING INFO TO DATABASE
+        DATE = str(datetime.datetime.today())
         inputs = np.mean(score_list)
         result_data = prep_data_to_send(inputs, GROUP_NAME, DATE)
         send_result(result_data)
