@@ -29,7 +29,6 @@ from pyvirtualdisplay import Display
 
 # Group Info :
 GROUP_NAME = "ADMIN"
-COMMENT = "First Test"
 
 display = Display(visible=0, size=(1400, 900))
 display.start()
