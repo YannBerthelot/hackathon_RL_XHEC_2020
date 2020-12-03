@@ -37,10 +37,10 @@ def info_extractor(states_list, env):
 
     states = {
         "x": x,
-        "y": y,
+        "y": y + 1,
         "angle": angle,
-        "first leg ground contact": first_leg_contact,
-        "second leg ground contact": second_leg_contact,
+        "first leg ground contact": first_leg_contact > 0,
+        "second leg ground contact": second_leg_contact > 0,
         "throttle": throttle,
         "gimbal": gimbal,
         "x velocity": velocity_x,
@@ -49,7 +49,7 @@ def info_extractor(states_list, env):
     }
     # additionnal useful variables
     additionnal_information = {
-        "distance": distance,
+        "distance": np.linalg.norm([x, y + 1]),
         "velocity": velocity,
         "landed": landed,
         "landed_full": landed_full,
