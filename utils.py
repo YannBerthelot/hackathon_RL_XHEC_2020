@@ -21,17 +21,17 @@ def info_extractor(states_list, env):
     Extracts information from the state vector into separate variables for usage and 2 dictionnaries for display
     """
     x = states_list[0]
-    y = states_list[1]
+    y = states_list[1] + 1
     angle = states_list[2]
-    first_leg_contact = states_list[3]
-    second_leg_contact = states_list[4]
+    first_leg_contact = states_list[3] > 0
+    second_leg_contact = states_list[4] > 0
     throttle = states_list[5]
     gimbal = states_list[6]
     velocity_x = states_list[7]
     velocity_y = states_list[8]
     angular_velocity = states_list[9]
-    distance = np.linalg.norm((3 * x, y))
-    velocity = np.linalg.norm((3 * velocity_x, velocity_y))
+    distance = np.linalg.norm((x, y))
+    velocity = np.linalg.norm((velocity_x, velocity_y))
     landed = (first_leg_contact > 0) and (second_leg_contact > 0) and velocity < 10
     landed_full = env.environment.landed_ticks > 59
 
