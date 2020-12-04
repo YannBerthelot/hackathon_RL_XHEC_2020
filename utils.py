@@ -32,7 +32,7 @@ def info_extractor(states_list, env):
     angular_velocity = states_list[9]
     distance = np.linalg.norm((x, y))
     velocity = np.linalg.norm((velocity_x, velocity_y))
-    landed = (first_leg_contact > 0) and (second_leg_contact > 0) and velocity < 10
+    landed = first_leg_contact and second_leg_contact and velocity < 10
     landed_full = env.environment.landed_ticks > 59
 
     states = {
