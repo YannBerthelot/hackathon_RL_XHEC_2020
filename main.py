@@ -170,7 +170,7 @@ class SpaceXRL:
 
         # SENDING INFO TO DATABASE
         DATE = str(datetime.datetime.today())
-        inputs = np.mean(score_list)
+        inputs = [np.mean(score_list), n_episodes]
         result_data = prep_data_to_send(inputs, GROUP_NAME, DATE)
         send_result(result_data)
 
