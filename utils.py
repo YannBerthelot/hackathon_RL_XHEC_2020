@@ -21,7 +21,7 @@ def info_extractor(states_list, env):
     Extracts information from the state vector into separate variables for usage and 2 dictionnaries for display
     """
     x = states_list[0]
-    y = states_list[1] + 1
+    y = states_list[1] + 1.5
     angle = states_list[2]
     first_leg_contact = states_list[3] > 0
     second_leg_contact = states_list[4] > 0
