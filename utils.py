@@ -37,7 +37,7 @@ def info_extractor(states_list, env):
 
     states = {
         "x": x,
-        "y": y + 1,
+        "y": y,
         "angle": angle,
         "first leg ground contact": first_leg_contact > 0,
         "second leg ground contact": second_leg_contact > 0,
